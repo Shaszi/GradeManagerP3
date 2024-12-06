@@ -11,7 +11,7 @@ namespace Domain.Entities
         }
 
         public string CourseName { get; private set; }
-        public int Credits { get; private set; } // New field for course credits
+        public int Credits { get; private set; }
         public double Grade { get; set; }
     }
 }

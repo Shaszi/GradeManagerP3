@@ -1,10 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using Domain.Entities;
+﻿using Domain.Entities;
 
 namespace Core.Services
 {
-    public class StudentServices
+    public class StudentService
     {
         public void ManageStudentCourses(Student student)
         {

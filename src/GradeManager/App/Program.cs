@@ -81,7 +81,5 @@ public class Program
         Console.WriteLine("Available students:");
         for (var i = 0; i < Service.Students.Count; i++)
             Console.WriteLine($"{i + 1}. {Service.Students[i].Name} (ID: {Service.Students[i].StudentId})");
-
-        // ... rest of your ShowStudentCoursesAndGrades implementation
     }
 }
