@@ -17,9 +17,10 @@ public class Program
         {
             Console.WriteLine("\nStudent Management System");
             Console.WriteLine("1. Create Student");
-            Console.WriteLine("2. Select Student");
-            Console.WriteLine("3. Show Student Courses and Grades");
-            Console.WriteLine("4. Exit");
+            Console.WriteLine("2. Manage Courses");
+            Console.WriteLine("3. Select Student");
+            Console.WriteLine("4. Show Student Courses and Grades");
+            Console.WriteLine("5. Exit");
             Console.Write("Enter your choice: ");
 
             var choice = Console.ReadLine();
@@ -30,12 +31,15 @@ public class Program
                     Service.CreateStudent();
                     break;
                 case "2":
-                    SelectStudent();
+                    Service.ManageCourses();
                     break;
                 case "3":
-                    ShowStudentCoursesAndGrades();
+                    SelectStudent();
                     break;
                 case "4":
+                    ShowStudentCoursesAndGrades();
+                    break;
+                case "5":
                     Environment.Exit(0);
                     break;
                 default:
@@ -62,7 +66,30 @@ public class Program
             selectedIndex <= Service.Students.Count)
         {
             var selectedStudent = Service.Students[selectedIndex - 1];
-            Service.ManageStudentCourses(selectedStudent);
+            while (true)
+            {
+                Console.WriteLine($"\nSelected Student: {selectedStudent.Name} (ID: {selectedStudent.StudentId})");
+                Console.WriteLine("1. Manage Courses and Grades");
+                Console.WriteLine("2. Show Student Information");
+                Console.WriteLine("3. Return to Main Menu");
+                Console.Write("Enter your choice: ");
+
+                var choice = Console.ReadLine();
+                switch (choice)
+                {
+                    case "1":
+                        Service.ManageStudentCourses(selectedStudent);
+                        break;
+                    case "2":
+                        ShowStudentInformation(selectedStudent);
+                        break;
+                    case "3":
+                        return;
+                    default:
+                        Console.WriteLine("Invalid choice. Please try again.");
+                        break;
+                }
+            }
         }
         else
         {
@@ -70,58 +97,81 @@ public class Program
         }
     }
 
-    private void ShowStudentCoursesAndGrades()
+    private void ShowStudentInformation(Student student)
     {
-        if (Service.Students.Count == 0)
+        Console.WriteLine($"\nStudent Information for {student.Name} (ID: {student.StudentId})");
+        Console.WriteLine("------------------------------------------------------------------");
+        
+        if (!student.Courses.Any())
         {
-            Console.WriteLine("No students available. Please create a student first.");
+            Console.WriteLine("No courses enrolled.");
             return;
         }
 
-        Console.WriteLine("\n=== Student Grades Report ===");
-        bool isFirst = true;
+        foreach (var course in student.Courses)
+        {
+            Console.WriteLine($"\nCourse: {course.CourseName} (Credits: {course.Credits})");
+            if (course.Grades.Any())
+            {
+                Console.WriteLine("Grades: " + string.Join(", ", course.Grades));
+                Console.WriteLine($"Final Grade: {course.FinalGrade:F2}");
+            }
+            else
+            {
+                Console.WriteLine("No grades recorded");
+            }
+        }
+
+        if (student.Courses.Any(c => c.Grades.Any()))
+        {
+            var gpa = student.Courses.Where(c => c.Grades.Any())
+                                   .Average(c => c.FinalGrade) / 25;
+            Console.WriteLine($"\nOverall GPA: {gpa:F2}");
+        }
         
+        Console.WriteLine("\nPress any key to continue...");
+        Console.ReadKey();
+    }
+
+    private void ShowStudentCoursesAndGrades()
+    {
         foreach (var student in Service.Students)
         {
-            if (!isFirst)
-            {
-                Console.ForegroundColor = ConsoleColor.Cyan;
-                Console.WriteLine("\n" + new string('=', 66));
-                Console.ResetColor();
-            }
-            isFirst = false;
-
-            Console.WriteLine($"\nStudent: {student.Name}");
-            Console.WriteLine($"ID: {student.StudentId}");
+            Console.WriteLine($"\nStudent: {student.Name} (ID: {student.StudentId})");
+            Console.WriteLine("Courses and Grades:");
+            Console.WriteLine("------------------------------------------------------------------");
             
-            if (student.Courses.Count == 0)
-            {
-                Console.WriteLine("No courses registered.");
-                continue;
-            }
-
-            Console.WriteLine("\nCourses and Grades:");
-            Console.WriteLine("------------------------------------------------------------------");
-            Console.WriteLine("Course Name".PadRight(30) + "Credits".PadRight(10) + "Grade");
-            Console.WriteLine("------------------------------------------------------------------");
-
-            double totalGradePoints = 0;
-            int totalCredits = 0;
-
             foreach (var course in student.Courses)
             {
-                Console.WriteLine($"{course.CourseName.PadRight(30)}{course.Credits.ToString().PadRight(10)}{course.Grade:F1}");
-                totalGradePoints += course.Grade * course.Credits;
-                totalCredits += course.Credits;
+                Console.WriteLine($"\nCourse: {course.CourseName} (Credits: {course.Credits})");
+                if (course.Grades.Any())
+                {
+                    Console.WriteLine("Grades: " + string.Join(", ", course.Grades));
+                    Console.WriteLine($"Final Grade: {course.FinalGrade:F2}");
+                }
+                else
+                {
+                    Console.WriteLine("No grades recorded");
+                }
             }
 
-            Console.WriteLine("------------------------------------------------------------------");
-            if (totalCredits > 0)
+            if (student.Courses.Any() && student.Courses.Any(c => c.Grades.Any()))
             {
-                double gpa = totalGradePoints / (totalCredits * 100) * 4.0;
-                Console.WriteLine($"GPA: {gpa:F2}");
+                var coursesWithGrades = student.Courses.Where(c => c.Grades.Any()).ToList();
+                if (coursesWithGrades.Any())
+                {
+                    var gpa = coursesWithGrades.Average(c => c.FinalGrade) / 25; // Convert to 4.0 scale
+                    Console.WriteLine($"\nOverall GPA: {gpa:F2}");
+                }
+                else
+                {
+                    Console.WriteLine("\nNo grades recorded yet - GPA cannot be calculated");
+                }
             }
-            Console.WriteLine($"Total Credits: {totalCredits}");
+            else
+            {
+                Console.WriteLine("\nNo courses or grades recorded yet - GPA cannot be calculated");
+            }
         }
     }
 }
