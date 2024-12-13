@@ -16,7 +16,7 @@ public class Program
         while (true)
         {
             Console.WriteLine("\nStudent Management System");
-            Console.WriteLine("1. Create Student");
+            Console.WriteLine("1. Manage Students");
             Console.WriteLine("2. Manage Courses");
             Console.WriteLine("3. Select Student");
             Console.WriteLine("4. Show Student Courses and Grades");
@@ -28,7 +28,7 @@ public class Program
             switch (choice)
             {
                 case "1":
-                    Service.CreateStudent();
+                    Service.ManageStudents();
                     break;
                 case "2":
                     Service.ManageCourses();
@@ -121,13 +121,6 @@ public class Program
                 Console.WriteLine("No grades recorded");
             }
         }
-
-        if (student.Courses.Any(c => c.Grades.Any()))
-        {
-            var gpa = student.Courses.Where(c => c.Grades.Any())
-                                   .Average(c => c.FinalGrade) / 25;
-            Console.WriteLine($"\nOverall GPA: {gpa:F2}");
-        }
         
         Console.WriteLine("\nPress any key to continue...");
         Console.ReadKey();
@@ -135,11 +128,27 @@ public class Program
 
     private void ShowStudentCoursesAndGrades()
     {
+        if (!Service.Students.Any())
+        {
+            Console.WriteLine("\nNo students registered in the system.");
+            return;
+        }
+
         foreach (var student in Service.Students)
         {
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine("\n══════════════════════════════════════════════════════════════════");
+            Console.ResetColor();
+            
             Console.WriteLine($"\nStudent: {student.Name} (ID: {student.StudentId})");
+            
+            if (!student.Courses.Any())
+            {
+                Console.WriteLine("No courses enrolled for this student.");
+                continue;
+            }
+
             Console.WriteLine("Courses and Grades:");
-            Console.WriteLine("------------------------------------------------------------------");
             
             foreach (var course in student.Courses)
             {
@@ -151,27 +160,13 @@ public class Program
                 }
                 else
                 {
-                    Console.WriteLine("No grades recorded");
+                    Console.WriteLine("No grades recorded for this course");
                 }
-            }
-
-            if (student.Courses.Any() && student.Courses.Any(c => c.Grades.Any()))
-            {
-                var coursesWithGrades = student.Courses.Where(c => c.Grades.Any()).ToList();
-                if (coursesWithGrades.Any())
-                {
-                    var gpa = coursesWithGrades.Average(c => c.FinalGrade) / 25; // Convert to 4.0 scale
-                    Console.WriteLine($"\nOverall GPA: {gpa:F2}");
-                }
-                else
-                {
-                    Console.WriteLine("\nNo grades recorded yet - GPA cannot be calculated");
-                }
-            }
-            else
-            {
-                Console.WriteLine("\nNo courses or grades recorded yet - GPA cannot be calculated");
             }
         }
+        
+        Console.ForegroundColor = ConsoleColor.Cyan;
+        Console.WriteLine("\n══════════════════════════════════════════════════════════════════");
+        Console.ResetColor();
     }
 }
