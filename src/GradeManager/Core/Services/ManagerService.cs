@@ -4,7 +4,14 @@ namespace Core.Services
 {
     public class ManagerService
     {
-        public List<Student> Students { get; private set; } = new List<Student>();
+        private readonly DataService _dataService;
+        public List<Student> Students => _dataService.Students;
+
+        public ManagerService()
+        {
+            _dataService = new DataService();
+            _dataService.LoadFromJson();
+        }
 
         public void CreateStudent()
         {
@@ -14,7 +21,8 @@ namespace Core.Services
             var studentId = Console.ReadLine();
 
             var newStudent = new Student(name, studentId);
-            Students.Add(newStudent);
+            _dataService.Students.Add(newStudent);
+            _dataService.SaveToJson();
 
             Console.WriteLine($"Student {name} with ID {studentId} created successfully.");
         }
@@ -48,7 +56,7 @@ namespace Core.Services
             }
         }
 
-        private static void AddCourse(Student student)
+        private void AddCourse(Student student)
         {
             Console.Write("Enter course name: ");
             var courseName = Console.ReadLine();
@@ -57,6 +65,7 @@ namespace Core.Services
             {
                 var newCourse = new Course(courseName, credits);
                 student.Courses.Add(newCourse);
+                _dataService.SaveToJson();
                 Console.WriteLine($"Course {courseName} added successfully.");
             }
             else
@@ -65,7 +74,7 @@ namespace Core.Services
             }
         }
 
-        private static void AddGrade(Student student)
+        private void AddGrade(Student student)
         {
             if (student.Courses.Count == 0)
             {
@@ -86,6 +95,7 @@ namespace Core.Services
                 if (double.TryParse(Console.ReadLine(), out var grade))
                 {
                     selectedCourse.Grade = grade;
+                    _dataService.SaveToJson();
                     Console.WriteLine($"Grade {grade} added successfully for {selectedCourse.CourseName}.");
                 }
                 else

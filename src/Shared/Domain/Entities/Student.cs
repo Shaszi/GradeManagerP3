@@ -2,6 +2,13 @@
 {
     public class Student
     {
+        public Student()
+        {
+            Name = string.Empty;
+            StudentId = string.Empty;
+            Courses = new List<Course>();
+        }
+
         public Student(string name, string studentId)
         {
             Name = name;
@@ -9,8 +16,8 @@
             Courses = new List<Course>();
         }
 
-        public string Name { get; private set; }
-        public string StudentId { get; private set; }
-        public List<Course> Courses { get; private set; }
+        public string Name { get; set; }
+        public string StudentId { get; set; }
+        public List<Course> Courses { get; set; }
     }
 }

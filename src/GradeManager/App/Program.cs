@@ -78,8 +78,50 @@ public class Program
             return;
         }
 
-        Console.WriteLine("Available students:");
-        for (var i = 0; i < Service.Students.Count; i++)
-            Console.WriteLine($"{i + 1}. {Service.Students[i].Name} (ID: {Service.Students[i].StudentId})");
+        Console.WriteLine("\n=== Student Grades Report ===");
+        bool isFirst = true;
+        
+        foreach (var student in Service.Students)
+        {
+            if (!isFirst)
+            {
+                Console.ForegroundColor = ConsoleColor.Cyan;
+                Console.WriteLine("\n" + new string('=', 66));
+                Console.ResetColor();
+            }
+            isFirst = false;
+
+            Console.WriteLine($"\nStudent: {student.Name}");
+            Console.WriteLine($"ID: {student.StudentId}");
+            
+            if (student.Courses.Count == 0)
+            {
+                Console.WriteLine("No courses registered.");
+                continue;
+            }
+
+            Console.WriteLine("\nCourses and Grades:");
+            Console.WriteLine("------------------------------------------------------------------");
+            Console.WriteLine("Course Name".PadRight(30) + "Credits".PadRight(10) + "Grade");
+            Console.WriteLine("------------------------------------------------------------------");
+
+            double totalGradePoints = 0;
+            int totalCredits = 0;
+
+            foreach (var course in student.Courses)
+            {
+                Console.WriteLine($"{course.CourseName.PadRight(30)}{course.Credits.ToString().PadRight(10)}{course.Grade:F1}");
+                totalGradePoints += course.Grade * course.Credits;
+                totalCredits += course.Credits;
+            }
+
+            Console.WriteLine("------------------------------------------------------------------");
+            if (totalCredits > 0)
+            {
+                double gpa = totalGradePoints / (totalCredits * 100) * 4.0;
+                Console.WriteLine($"GPA: {gpa:F2}");
+            }
+            Console.WriteLine($"Total Credits: {totalCredits}");
+        }
     }
 }
