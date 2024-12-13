@@ -79,14 +79,14 @@ namespace Core.Services
             }
 
             Console.Write("Enter grade (0-100): ");
-            if (!double.TryParse(Console.ReadLine(), out var grade) || grade < 0 || grade > 100)
+            if (!decimal.TryParse(Console.ReadLine(), out var grade) || grade < 0 || grade > 100)
             {
                 Console.WriteLine("Invalid grade. Grade must be between 0 and 100.");
                 return;
             }
 
             var selectedCourse = student.Courses[courseIndex - 1];
-            selectedCourse.Grade = grade;
+            selectedCourse.Grades.Add(grade);
             Console.WriteLine($"Grade {grade} added to course '{selectedCourse.CourseName}' successfully.");
         }
     }
