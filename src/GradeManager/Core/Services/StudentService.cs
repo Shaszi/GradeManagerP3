@@ -1,9 +1,46 @@
 ﻿using Domain.Entities;
+using Core.Interfaces;
 
 namespace Core.Services
 {
-    public class StudentService
+    public class StudentService : IStudentService
     {
+        private readonly List<Student> _students = new();
+
+        public void AddStudent(Student student)
+        {
+            _students.Add(student);
+        }
+
+        public Student GetStudent(string studentId)
+        {
+            return _students.FirstOrDefault(s => s.StudentId == studentId);
+        }
+
+        public IEnumerable<Student> GetAllStudents()
+        {
+            return _students;
+        }
+
+        public void RemoveStudent(string studentId)
+        {
+            var student = GetStudent(studentId);
+            if (student != null)
+            {
+                _students.Remove(student);
+            }
+        }
+
+        public void UpdateStudent(Student student)
+        {
+            var existingStudent = GetStudent(student.StudentId);
+            if (existingStudent != null)
+            {
+                existingStudent.Name = student.Name;
+                existingStudent.Courses = student.Courses;
+            }
+        }
+
         public void ManageStudentCourses(Student student)
         {
             while (true)
