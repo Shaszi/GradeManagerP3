@@ -81,6 +81,12 @@ namespace Core.Services
                 return;
             }
 
+            if (student.Courses.Any(c => c.CourseName.Equals(courseName, StringComparison.OrdinalIgnoreCase)))
+            {
+                Console.WriteLine($"Student already has course '{courseName}'. Cannot add duplicate courses.");
+                return;
+            }
+
             Console.Write("Enter course credits: ");
             if (!int.TryParse(Console.ReadLine(), out var credits))
             {
