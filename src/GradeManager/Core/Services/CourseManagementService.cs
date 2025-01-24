@@ -60,6 +60,7 @@ namespace Core.Services
                 return;
             }
 
+            Console.Clear();
             Console.WriteLine("\nAvailable Courses:");
             Console.WriteLine("------------------------------------------");
             Console.WriteLine("#".PadRight(4) + "Course Name".PadRight(30) + "Credits");
