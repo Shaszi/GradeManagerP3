@@ -1,25 +1,69 @@
 ﻿using Domain.Entities;
 
+namespace Core.Services;
 
-namespace Core.Services
+public class GradeService : IGradeService
 {
-    internal class GradeService
+    private readonly IFileService _fileService;
+
+    public GradeService(IFileService fileService)
     {
-        private static void AddCourse(Student student)
+        _fileService = fileService;
+    }
+
+    public bool AddGradeToStudent(string studentId, string courseName, int grade)
+    {
+        try
         {
-            Console.Write("Enter course name: ");
-            var courseName = Console.ReadLine();
-            Console.Write("Enter course credits: ");
-            if (int.TryParse(Console.ReadLine(), out var credits))
+            var students = _fileService.GetStudents();
+            var student = students.FirstOrDefault(s => s.StudentId == studentId);
+            if (student == null)
             {
-                var newCourse = new Course(courseName, credits);
-                student.Courses.Add(newCourse);
-                Console.WriteLine($"Course {courseName} added successfully.");
+                return false;
             }
-            else
+
+            var course = student.Courses.FirstOrDefault(c => c.CourseName == courseName);
+            if (course == null)
             {
-                Console.WriteLine("Invalid credits. Course not added.");
+                return false;
             }
+
+            course.Grades.Add(grade);
+            course.FinalGrade = course.Grades.Average();
+            _fileService.SaveStudents(students);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public bool RemoveLastGrade(string studentId, string courseName)
+    {
+        try
+        {
+            var students = _fileService.GetStudents();
+            var student = students.FirstOrDefault(s => s.StudentId == studentId);
+            if (student == null)
+            {
+                return false;
+            }
+
+            var course = student.Courses.FirstOrDefault(c => c.CourseName == courseName);
+            if (course == null || !course.Grades.Any())
+            {
+                return false;
+            }
+
+            course.Grades.RemoveAt(course.Grades.Count - 1);
+            course.FinalGrade = course.Grades.Any() ? course.Grades.Average() : 0;
+            _fileService.SaveStudents(students);
+            return true;
+        }
+        catch
+        {
+            return false;
         }
     }
 }
